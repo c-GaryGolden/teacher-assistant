@@ -14,23 +14,11 @@ Aplikacja jest podzielona na dedykowane moduły:
 * 💬 **Czat (Chat):** Wbudowany system komunikacji ułatwiający wymianę informacji.
 
 ---
+## 🛠️ Stack Technologiczny
 
-teacher-assistant/
-├── app/                    # Pakiet główny aplikacji
-│   ├── routes/             # Logika poszczególnych modułów
-│   │   ├── auth.py
-│   │   ├── chat.py
-│   │   ├── dashboard.py
-│   │   ├── repository.py
-│   │   └── school.py
-│   ├── submissions/        # [Lokalny / Ignorowany] Folder na zadania domowe uczniów
-│   ├── templates/          # Szablony HTML (Jinja2)
-│   ├── uploads/            # [Lokalny / Ignorowany] Folder na materiały dydaktyczne
-│   ├── __init__.py         # Inicjalizacja aplikacji i rejestracja modułów
-│   ├── decorators.py       # Dekoratory uprawnień i dostępu
-│   └── models.py           # Struktura tabel bazy danych (SQLAlchemy)
-├── instance/               # [Automatycznie generowany] Katalog na dane aplikacji
-│   └── app.db              # Lokalny plik bazy danych SQLite
-├── config.py               # Automatyzacja tworzenia środowiska i parametrów aplikacji
-├── requirements.txt        # Zablokowane wersje bibliotek
-└── run.py                  # Główny punkt startowy aplikacji
+| Warstwa | Wybrana technologia | Rola w aplikacji / Charakterystyka |
+| :--- | :--- | :--- |
+| **Backend** | Python 3.12 + Flask 3.1 | Główny motor aplikacji. Obsługuje routing, logikę biznesową, autoryzację i przetwarzanie plików. |
+| **Frontend** | Pico CSS + Jinja2 | Pico CSS to ultralekki framework CSS, który automatycznie styluje czyste, semantyczne tagi HTML (formularze, tabele, przyciski) bez używania skomplikowanych klas. Jinja2 odpowiada za dynamiczne wstrzykiwanie danych z Pythona do szablonów. |
+| **Baza danych** | SQLAlchemy ORM + SQLite | Mapowanie obiektowo-relacyjne (brak czystego SQL w kodzie). SQLite przechowuje dane w jednym pliku lokalnym. Tabele są generowane automatycznie przy starcie aplikacji przez `db.create_all()`. |
+| **Autentykacja** | Flask-Login | Obsługa ciasteczek sesyjnych, bezpieczne logowanie oraz ochrona tras przed nieuprawnionym dostępem za pomocą dekoratorów. |
