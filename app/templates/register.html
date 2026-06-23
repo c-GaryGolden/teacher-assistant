@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Rejestracja - EduPlatform{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 2rem auto;">
+    <article>
+        <header>
+            <h3 style="margin: 0;">Tworzenie konta</h3>
+        </header>
+        <form method="POST">
+            <label for="username">
+                Nazwa użytkownika
+                <input type="text" id="username" name="username" placeholder="Wpisz login" required>
+            </label>
+
+            <label for="password">
+                Hasło
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </label>
+
+            <label for="role">
+                Rola w systemie
+                <select id="role" name="role" required>
+                    <option value="student" selected>Uczeń / Student</option>
+                    <option value="teacher">Nauczyciel / Wykładowca</option>
+                </select>
+            </label>
+
+            <button type="submit">Zarejestruj konto</button>
+        </form>
+        <footer>
+            <small>Masz już konto? <a href="{{ url_for('auth.login') }}">Zaloguj się</a></small>
+        </footer>
+    </article>
+</div>
+{% endblock %}

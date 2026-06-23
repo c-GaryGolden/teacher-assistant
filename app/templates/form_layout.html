@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - EduPlatform{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 2rem auto;">
+    <article>
+        <header>
+            <h3 style="margin: 0;">{{ title }}</h3>
+        </header>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% for field in fields %}
+                <fieldset style="margin-bottom: 1rem; border: none; padding: 0;">
+                    <label for="field-{{ field.name }}">
+                        <strong>{{ field.placeholder }}</strong>
+                        
+                       {% if field.type == 'select' %}
+    <select name="{{ field.name }}" class="form-control">
+        <option value="">-- Wybierz --</option>
+        {% for opt in field.options %}
+            <option value="{{ opt.id }}" {% if field.value and opt.id == field.value|int %}selected{% endif %}>
+                {{ opt.name or opt.username }}
+            </option>
+        {% endfor %}
+    </select>
+                        {% elif field.type == 'textarea' %}
+                            <textarea id="field-{{ field.name }}" name="{{ field.name }}" placeholder="{{ field.placeholder }}" rows="4"></textarea>
+                        {% else %}
+                            <input type="{{ field.type }}" id="field-{{ field.name }}" name="{{ field.name }}" placeholder="{{ field.placeholder }}">
+                        {% endif %}
+                    </label>
+                </fieldset>
+            {% endfor %}
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; align-items: center;">
+                <button type="submit" style="flex-grow: 1; margin: 0;">{{ btn_text or 'Zapisz' }}</button>
+                <a href="{{ url_for('dashboard.index') }}" class="button outline secondary" style="flex-grow: 1; margin: 0; text-align: center;">Anuluj</a>
+            </div>
+        </form>
+    </article>
+</div>
+{% endblock %}

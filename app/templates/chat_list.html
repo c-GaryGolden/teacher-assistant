@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Wybierz rozmówcę</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body class="container" style="padding-top: 20px;">
+    <main>
+        <article>
+            <header style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">Twoje czaty</h2>
+                <a href="{{ url_for('dashboard.index') }}" class="outline" role="button">Powrót</a>
+            </header>
+            
+            <ul style="list-style-type: none; padding: 0;">
+                {% for u in users %}
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--muted-border-color);">
+                        <div>
+                            <strong>{{ u.username }}</strong> 
+                            <small style="margin-left: 10px; color: var(--muted-color);">({{ u.role }})</small>
+                        </div>
+                        <a href="{{ url_for('chat.chat', recipient_id=u.id) }}" role="button" class="secondary" style="margin: 0; padding: 5px 15px;">
+                            Rozpocznij czat
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="muted" style="text-align: center; padding: 20px;">Brak zarejestrowanych rozmówców.</li>
+                {% endfor %}
+            </ul>
+        </article>
+    </main>
+</body>
+</html>

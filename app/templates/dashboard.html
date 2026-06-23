@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Główny - EduPlatform{% endblock %}
+
+{% block content %}
+
+<article style="margin-bottom: 2rem; padding: 1rem 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            {% if user.role == 'student' %}
+                <span>Status wsparcia: </span>
+                {% if user.needs_help %}
+                    <mark style="background-color: #d32f2f; color: white; padding: 2px 8px; border-radius: 4px;">POTRZEBUJESZ WSPARCIA</mark>
+                {% else %}
+                    <mark style="background-color: #388e3c; color: white; padding: 2px 8px; border-radius: 4px;">Wszystko w porządku</mark>
+                {% endif %}
+            {% else %}
+                <strong>Panel Nauczyciela</strong>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0;">
+            <a href="{{ url_for('chat.chat_list') }}" class="button contrast outline" style="padding: 0.4rem 1rem; font-size: 0.9rem; margin: 0;">💬 Wiadomości</a>
+            
+            {% if user.role == 'student' %}
+                <a href="{{ url_for('school.request_help') }}" class="button {% if user.needs_help %}secondary{% else %}primary{% endif %}" style="padding: 0.4rem 1rem; font-size: 0.9rem; margin: 0;">
+                    {{ '❌ Odwołaj prośbę' if user.needs_help else '🚨 Poproś o pomoc' }}
+                </a>
+            {% else %}
+                <a href="{{ url_for('repo.create') }}" class="button secondary outline" style="padding: 0.4rem 1rem; font-size: 0.9rem; margin: 0;">+ Repo</a>
+                <a href="{{ url_for('school.create_class') }}" class="button secondary outline" style="padding: 0.4rem 1rem; font-size: 0.9rem; margin: 0;">+ Klasa</a>
+                <a href="{{ url_for('school.create_group') }}" class="button secondary outline" style="padding: 0.4rem 1rem; font-size: 0.9rem; margin: 0;">+ Grupa</a>
+                <a href="{{ url_for('repo.view_all_submissions') }}" class="button contrast" style="padding: 0.4rem 1rem; font-size: 0.9rem; margin: 0;">📥 Zadania</a>
+            {% endif %}
+        </div>
+    </div>
+</article>
+
+{% if user.role == 'teacher' %}
+    {% if help_alerts and (help_alerts.students or help_alerts.groups) %}
+        <article style="background-color: #fff3cd; border-left: 6px solid #ffc107; color: #664d03; margin-bottom: 2rem; padding: 1rem 1.5rem;">
+            <h4 style="margin-top: 0; color: #664d03;">🚨 Pilne zgłoszenia o pomoc:</h4>
+            <ul style="margin-bottom: 0;">
+                {% for u in help_alerts.students %}
+                    <li>Uczeń: <strong>{{ u.username }}</strong> — <a href="{{ url_for('chat.chat', recipient_id=u.id) }}" style="color: #664d03; font-weight: bold; text-decoration: underline;">Otwórz czat</a></li>
+                {% endfor %}
+                {% for g in help_alerts.groups %}
+                    <li>Grupa: <strong>{{ g.name }}</strong> (Zgłoszenie grupowe)</li>
+                {% endfor %}
+            </ul>
+        </article>
+    {% endif %}
+{% endif %}
+
+<div class="grid">
+    
+    <div>
+        <h2 style="border-bottom: 2px solid var(--pico-typography-spacing); padding-bottom: 0.5rem; font-size: 1.5rem;">Szkolenia i Zespoły</h2>
+        
+        <h3 style="font-size: 1.2rem; margin-top: 1rem; color: var(--pico-muted-color);">Klasy</h3>
+        {% for c in classes %}
+            <article style="padding: 1rem; margin-bottom: 1rem; border-left: 4px solid var(--pico-primary);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="margin: 0; font-size: 1.1rem;">{{ c.name }}</h4>
+                    {% if user.role == 'teacher' %}
+                        <a href="{{ url_for('school.delete_class', class_id=c.id) }}" style="color: #d32f2f; font-size: 0.85rem;" onclick="return confirm('Usunąć klasę?')">Usuń</a>
+                    {% endif %}
+                </div>
+                
+                <details style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <summary style="font-size: 0.85rem; padding: 0.25rem 0;">Lista uczniów ({{ c.students|length }})</summary>
+                    <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 1rem;">
+                        {% for student in c.students %}
+                            <li>
+                                {{ student.username }}
+                                {% if user.role == 'teacher' %}
+                                    <span style="color: var(--pico-muted-color); font-size: 0.8rem;">(ID: {{ student.id }})</span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+                
+                {% if user.role == 'student' and user not in c.students %}
+                    <a href="{{ url_for('school.join_class', class_id=c.id) }}" class="button outline" style="width: auto; padding: 0.25rem 0.75rem; font-size: 0.85rem; margin-top: 0.5rem; display: inline-block;">Dołącz do klasy</a>
+                {% endif %}
+            </article>
+        {% else %}
+            <p><small class="muted">Brak zdefiniowanych klas.</small></p>
+        {% endfor %}
+
+        <h3 style="font-size: 1.2rem; margin-top: 2rem; color: var(--pico-muted-color);">Grupy Projektowe</h3>
+        {% for g in groups %}
+            <article style="padding: 1rem; margin-bottom: 1rem; border-left: 4px solid #388e3c;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="margin: 0; font-size: 1.1rem;">{{ g.name }}</h4>
+                    {% if user.role == 'teacher' %}
+                        <a href="{{ url_for('school.delete_group', group_id=g.id) }}" style="color: #d32f2f; font-size: 0.85rem;" onclick="return confirm('Usunąć grupę?')">Usuń</a>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                    <strong>Członkowie:</strong> 
+                    {% for member in g.members %}
+                        {{ member.username }}{% if not loop.last %}, {% endif %}
+                    {% else %}
+                        <span class="muted">Brak członków</span>
+                    {% endfor %}
+                </div>
+                
+                {% if user.role == 'student' %}
+                    <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                        {% if user in g.members %}
+                            <a href="{{ url_for('school.leave_group', group_id=g.id) }}" class="button outline secondary" style="padding: 0.2rem 0.6rem; font-size: 0.8rem; margin:0;">Opuść grupę</a>
+                            <a href="{{ url_for('school.group_help', group_id=g.id) }}" class="button {% if g.needs_help %}contrast{% else %}outline secondary{% endif %}" style="padding: 0.2rem 0.6rem; font-size: 0.8rem; margin:0;">
+                                {{ 'Odwołaj pomoc' if g.needs_help else '🚨 Pomoc grupowa' }}
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('school.join_group', group_id=g.id) }}" class="button outline" style="padding: 0.2rem 0.6rem; font-size: 0.8rem; margin:0;">Dołącz do grupy</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </article>
+        {% else %}
+            <p><small class="muted">Brak zdefiniowanych grup projektowych.</small></p>
+        {% endfor %}
+    </div>
+
+    <div>
+        <h2 style="border-bottom: 2px solid var(--pico-typography-spacing); padding-bottom: 0.5rem; font-size: 1.5rem;">Repozytoria Plików</h2>
+        
+        {% for repo in repositories %}
+            <article style="margin-bottom: 1.5rem; padding: 0;">
+                <header style="padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h3 style="margin: 0; font-size: 1.1rem;">
+                        {{ repo.name }}
+                        {% if repo.is_public %}
+                            <span style="font-size: 0.7rem; background-color: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 4px; margin-left: 0.5rem;">Publiczne</span>
+                        {% else %}
+                            <span style="font-size: 0.7rem; background-color: #eceff1; color: #455a64; padding: 2px 6px; border-radius: 4px; margin-left: 0.5rem;">Prywatne</span>
+                        {% endif %}
+                    </h3>
+                    {% if user.role == 'teacher' %}
+                        <a href="{{ url_for('repo.assign', repo_id=repo.id) }}" style="font-size: 0.85rem;">Uprawnienia</a>
+                    {% endif %}
+                </header>
+
+                <div style="padding: 0 1rem 1rem 1rem;">
+                    <p style="font-size: 0.95rem; margin-bottom: 0.75rem;">{{ repo.description }}</p>
+
+                    <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Materiały do pobrania:</strong>
+                    <ul style="font-size: 0.9rem; padding-left: 1rem; margin-bottom: 0;">
+                        {% for file in repo.files %}
+                            <li>
+                                {{ file.filename }} 
+                                <a href="{{ url_for('repo.download', file_id=file.id) }}" style="margin-left: 0.5rem;"><small>[Pobierz]</small></a>
+                            </li>
+                        {% else %}
+                            <li style="list-style-type: none; margin-left: -1rem;" class="muted"><small>Brak plików w repozytorium.</small></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <footer style="padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0; background-color: var(--pico-card-sectionning-background-color);">
+                    <div>
+                        {% if user.role == 'teacher' %}
+                            <a href="{{ url_for('repo.upload', repo_id=repo.id) }}" class="button secondary outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; margin: 0;">↑ Wgraj plik</a>
+                        {% elif user.role == 'student' %}
+                            <a href="{{ url_for('repo.submit', repo_id=repo.id) }}" class="button primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; margin: 0;">🚀 ODEŚLIJ ZADANIE</a>
+                        {% endif %}
+                    </div>
+
+                    {% if user.role == 'teacher' %}
+                        <form action="{{ url_for('repo.delete', repo_id=repo.id) }}" method="POST" onsubmit="return confirm('Usunąć repozytorium?');" style="margin: 0;">
+                            <button type="submit" style="background: transparent; border: none; color: #d32f2f; padding: 0; margin: 0; font-size: 0.85rem; box-shadow: none; width: auto; cursor: pointer;">Usuń</button>
+                        </form>
+                    {% endif %}
+                </footer>
+            </article>
+        {% else %}
+            <p><small class="muted">Brak przydzielonych repozytoriów plików.</small></p>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

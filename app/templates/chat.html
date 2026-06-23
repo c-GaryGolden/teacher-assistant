@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Czat z {{ recipient.username }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body class="container" style="padding-top: 20px;">
+    <main>
+        <article>
+            <header style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">Czat z użytkownikiem: <u>{{ recipient.username }}</u></h2>
+                <a href="{{ url_for('chat.chat_list') }}" class="outline" role="button">← Lista czatów</a>
+            </header>
+
+            <div style="height: 350px; overflow-y: auto; border: 1px solid var(--muted-border-color); padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; background-color: var(--code-background-color);">
+                {% for msg in messages %}
+                    <div style="margin-bottom: 12px; text-align: {% if msg.author_id == current_user.id %}right{% else %}left{% endif %};">
+                        <span style="display: inline-block; padding: 8px 14px; border-radius: var(--border-radius); background-color: {% if msg.author_id == current_user.id %}var(--primary){% else %}var(--card-background-color){% endif %}; color: {% if msg.author_id == current_user.id %}white{% else %}var(--color){% endif %}; max-width: 70%; text-align: left; border: 1px solid var(--muted-border-color);">
+                            <small style="display: block; font-size: 0.75em; opacity: 0.8; margin-bottom: 3px;">
+                                <strong>{{ msg.author.username }}</strong> • {{ msg.timestamp.strftime('%H:%M') }}
+                            </small>
+                            {{ msg.content }}
+                        </span>
+                    </div>
+                {% else %}
+                    <p style="text-align: center; margin-top: 130px; color: var(--muted-color);">Brak wiadomości. Napisz coś jako pierwszy!</p>
+                {% endfor %}
+            </div>
+
+            <form method="POST" style="display: flex; gap: 10px; margin: 0;">
+                <input type="text" name="content" placeholder="Wpisz treść wiadomości..." required style="margin: 0; flex-grow: 1;">
+                <button type="submit" style="margin: 0; width: auto; padding: 0 30px;">Wyślij</button>
+            </form>
+        </article>
+    </main>
+</body>
+</html>

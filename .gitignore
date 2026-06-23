@@ -1,0 +1,24 @@
+# Środowisko wirtualne
+venv/
+ENV/
+env/
+
+# Pliki tymczasowe Pythona
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Środowisko i sekrety (BARDZO WAŻNE)
+.env
+.flaskenv
+
+# Bazy danych i pliki lokalne
+instance/
+*.db
+*.sqlite
+
+# Pliki systemowe
+.DS_Store
+Thumbs.db

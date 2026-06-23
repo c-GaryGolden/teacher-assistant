@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}System Edukacyjny{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <header class="container">
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{ url_for('dashboard.index') }}" class="contrast">
+                        <strong>🎓 EduPlatform</strong>
+                    </a>
+                </li>
+            </ul>
+            <ul>
+                {% if current_user.is_authenticated %}
+                    <li>
+                        <small>Zalogowany: <strong>{{ current_user.username }}</strong> ({{ current_user.role }})</small>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('auth.logout') }}" class="outline secondary" style="padding: 0.25rem 0.75rem;">Wyloguj</a>
+                    </li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}">Zaloguj</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">Rejestracja</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 1rem; margin-bottom: 1.5rem; border-radius: var(--pico-border-radius); 
+                                background-color: {% if category == 'error' %}#f8d7da{% else %}#d1e7dd{% endif %}; 
+                                color: {% if category == 'error' %}#842029{% else %}#0f5132{% endif %}; 
+                                border: 1px solid {% if category == 'error' %}#f5c2c7{% else %}#badbcc{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container" style="text-align: center; margin-top: 3rem; padding: 2rem 0; border-top: 1px solid var(--pico-muted-border-color);">
+        <small class="muted">&copy; 2026 EduPlatform. Wszystkie prawa zastrzeżone.</small>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Logowanie - EduPlatform{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 2rem auto;">
+    <article>
+        <header>
+            <h3 style="margin: 0;">Logowanie</h3>
+        </header>
+        <form method="POST">
+            <label for="username">
+                Nazwa użytkownika
+                <input type="text" id="username" name="username" placeholder="Wpisz login" required>
+            </label>
+
+            <label for="password">
+                Hasło
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </label>
+
+            <button type="submit" class="contrast">Zaloguj się</button>
+        </form>
+        <footer>
+            <small>Nie masz jeszcze konta? <a href="{{ url_for('auth.register') }}">Zarejestruj się tutaj</a></small>
+        </footer>
+    </article>
+</div>
+{% endblock %}
