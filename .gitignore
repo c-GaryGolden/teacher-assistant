@@ -18,7 +18,7 @@ __pycache__/
 instance/
 *.db
 *.sqlite
-submissions/
+app/submissions/
 # Pliki systemowe
 .DS_Store
 Thumbs.db
